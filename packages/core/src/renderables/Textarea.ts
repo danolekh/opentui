@@ -369,6 +369,17 @@ export class TextareaRenderable extends EditBufferRenderable {
 
   public moveCursorLeft(options?: { select?: boolean }): boolean {
     const select = options?.select ?? false
+
+    // Browser behavior: if there's a selection and shift is not pressed,
+    // move cursor to the start of the selection
+    if (!select && this.hasSelection()) {
+      const selection = this.getSelection()!
+      this.editBuffer.setCursorByOffset(selection.start)
+      this._ctx.clearSelection()
+      this.requestRender()
+      return true
+    }
+
     this.updateSelectionForMovement(select, true)
     this.editBuffer.moveCursorLeft()
     this.updateSelectionForMovement(select, false)
@@ -378,6 +389,17 @@ export class TextareaRenderable extends EditBufferRenderable {
 
   public moveCursorRight(options?: { select?: boolean }): boolean {
     const select = options?.select ?? false
+
+    // Browser behavior: if there's a selection and shift is not pressed,
+    // move cursor to the end of the selection
+    if (!select && this.hasSelection()) {
+      const selection = this.getSelection()!
+      this.editBuffer.setCursorByOffset(selection.end)
+      this._ctx.clearSelection()
+      this.requestRender()
+      return true
+    }
+
     this.updateSelectionForMovement(select, true)
     this.editBuffer.moveCursorRight()
     this.updateSelectionForMovement(select, false)
